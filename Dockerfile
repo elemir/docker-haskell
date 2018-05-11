@@ -26,7 +26,7 @@ RUN apt-get install -y --no-install-recommends cabal-install-${CABAL_VERSION} gh
 ## install and check stack
 RUN curl -fSL https://github.com/commercialhaskell/stack/releases/download/v${STACK_VERSION}/stack-${STACK_VERSION}-linux-x86_64.tar.gz -o stack.tar.gz && \
     curl -fSL https://github.com/commercialhaskell/stack/releases/download/v${STACK_VERSION}/stack-${STACK_VERSION}-linux-x86_64.tar.gz.asc -o stack.tar.gz.asc && \
-    gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys C5705533DA4F78D8664B5DC0575159689BEFB442 && \
+    gpg --keyserver ipv4.pool.sks-keyservers.net --recv-keys C5705533DA4F78D8664B5DC0575159689BEFB442 && \
     gpg --batch --verify stack.tar.gz.asc stack.tar.gz && \
     tar -xf stack.tar.gz -C /usr/local/bin --strip-components=1 && \
     /usr/local/bin/stack config set system-ghc --global true

@@ -1,24 +1,83 @@
+ghc: &ghc
+  docker:
+    - image: docker:18.05
+  steps:
+    - checkout
+    - setup_remote_docker
+    - run: docker build
+             --build-arg GHC_VERSION=${GHC_VERSION}
+             --build-arg CABAL_VERSION=${CABAL_VERSION}
+             --build-arg STACK_VERSION=${STACK_VERSION}
+             --build-arg ALEX_VERSION=${ALEX_VERSION}
+             --build-arg HAPPY_VERSION=${HAPPY_VERSION}
+             -t ${DOCKER_LOGIN}/haskell:${GHC_VERSION}
+             -t ${DOCKER_LOGIN}/haskell:${GHC_VERSION%.*}
+             -t ${DOCKER_LOGIN}/haskell:${GHC_VERSION%%.*}
+             -t ${DOCKER_LOGIN}/haskell:latest
+             .
+    - run: docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
+    - run: docker push ${DOCKER_LOGIN}/haskell:${GHC_VERSION}
+    - run: docker push ${DOCKER_LOGIN}/haskell:${GHC_VERSION%.*}
+    - run: test ${PUSH_MAJOR} && docker push ${DOCKER_LOGIN}/haskell:${GHC_VERSION%%.*} || true
+    - run: test ${PUSH_LATEST} && docker push ${DOCKER_LOGIN}/haskell:latest || true
+
+env: &env
+  CABAL_VERSION: "2.2"
+  STACK_VERSION: "1.7.1"
+  ALEX_VERSION: "3.1.7"
+  HAPPY_VERSION: "1.19.5"
+
 version: 2
+
 jobs:
-  build:
-    docker:
-      - image: docker:18.05
+  "ghc-8.4.2":
+    << : *ghc
     environment:
+      << : *env
       GHC_VERSION: "8.4.2"
-      CABAL_VERSION: "2.2"
-      STACK_VERSION: "1.7.1"
-      ALEX_VERSION: "3.1.7"
-      HAPPY_VERSION: "1.19.5"
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: docker build
-               --build-arg GHC_VERSION=${GHC_VERSION}
-               --build-arg CABAL_VERSION=${CABAL_VERSION}
-               --build-arg STACK_VERSION=${STACK_VERSION}
-               --build-arg ALEX_VERSION=${ALEX_VERSION}
-               --build-arg HAPPY_VERSION=${HAPPY_VERSION}
-               -t elemir/haskell:${GHC_VERSION}
-               .
-      - run: docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
-      - run: docker push ${DOCKER_LOGIN}/haskell:${GHC_VERSION}
+      PUSH_LATEST: "true"
+      PUSH_MAJOR: "true"
+  "ghc-8.2.2":
+    << : *ghc
+    environment:
+      << : *env
+      GHC_VERSION: "8.2.2"
+  "ghc-8.0.2":
+    << : *ghc
+    environment:
+      << : *env
+      GHC_VERSION: "8.0.2"
+  "ghc-7.10.3":
+    << : *ghc
+    environment:
+      << : *env
+      GHC_VERSION: "7.10.3"
+      PUSH_MAJOR: "true"
+  "ghc-7.8.4":
+    << : *ghc
+    environment:
+      << : *env
+      GHC_VERSION: "7.8.4"
+  "ghc-7.6.3":
+    << : *ghc
+    environment:
+      << : *env
+      GHC_VERSION: "7.6.3"
+  "ghc-7.4.2":
+    << : *ghc
+    environment:
+      << : *env
+      GHC_VERSION: "7.4.2"
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - "ghc-8.4.2"
+      - "ghc-8.2.2"
+      - "ghc-8.0.2"
+      - "ghc-7.10.3"
+      - "ghc-7.8.4"
+      - "ghc-7.6.3"
+      - "ghc-7.4.2"
+
