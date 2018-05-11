@@ -1,0 +1,24 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: docker:18.05
+    environment:
+      GHC_VERSION: "8.4.2"
+      CABAL_VERSION: "2.2"
+      STACK_VERSION: "1.7.1"
+      ALEX_VERSION: "3.1.7"
+      HAPPY_VERSION: "1.19.5"
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker build
+               --build-arg GHC_VERSION=${GHC_VERSION}
+               --build-arg CABAL_VERSION=${CABAL_VERSION}
+               --build-arg STACK_VERSION=${STACK_VERSION}
+               --build-arg ALEX_VERSION=${ALEX_VERSION}
+               --build-arg HAPPY_VERSION=${HAPPY_VERSION}
+               -t elemir/haskell:${GHC_VERSION}
+               .
+      - run: docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
+      - run: docker push ${DOCKER_LOGIN}/haskell:${GHC_VERSION}
