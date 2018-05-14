@@ -15,7 +15,7 @@ RUN apt-get update && \
     apt-get install -y gnupg curl
 
 ## add KVR ppa
-RUN echo 'deb http://ppa.launchpad.net/hvr/ghc/ubuntu trusty main' > /etc/apt/sources.list.d/ghc.list && \
+RUN echo 'deb http://ppa.launchpad.net/hvr/ghc/ubuntu bionic main' > /etc/apt/sources.list.d/ghc.list && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys F6F88286 && \
     apt-get update
 
